@@ -1,28 +1,35 @@
 #lang typed/racket
+(require threading)
 
 ;; Binomial Queue
-(define-type (a) BinomialHeap (Listof (BinomialTree a)))
 
-(define-type (a) BinomialTree (Node a))
+
+(define-type (BinomialTree a) (Node a))
 
 (struct (a) Node
   ([data : a]
    [rank : Integer]
-   [tree-list : (Listof BinomialTree)]))
+   [tree-list : (Listof (BinomialTree a))]))
+
+(define-type (BinomialHeap a) (Listof (BinomialTree a)))
+
+(: make->binomial-tree (All (a) (-> a (BinomialTree a))))
+(define (make->binomial-tree data)
+  (Node data 0 '()))
 
 (: root (All (a) (-> BinomialTree a)))
 (define (root node) (Node-data node))
 
-(: rank (-> BinomialTree Integer))
+(: rank (All (a) (-> (BinomialTree a) Integer)))
 (define (rank node) (Node-rank node))
 
-(: link (-> BinomialTree BinomialTree BinomialTree))
+(: link (All (a) (-> (BinomialTree a) (BinomialTree a) (BinomialTree a))))
 (define (link other this)
   (if (<= (root this) (root other))
       (Node (root this) (+ (rank this) 1) (other . (Node-tree-list this)))
       (Node (root other) (+ (rank other) 1) (this . (Node-tree-list other)))))
 
-(: ins (-> BinomialTree (Listof BinomialTree) (Listof BinomialTree)))
+(: ins (All (a) (-> BinomialTree (Listof (BinomialTree a)) (Listof (BinomialTree a)))))
 (define (ins tree tree-list)
   (if (empty? tree-list)
       (list tree)
@@ -30,12 +37,12 @@
           (cons tree tree-list)
           (ins (link tree (car tree-list)) (cdr tree-list)))))
 
-(: empty? (-> (Listof BinomialTree) Boolean))
+(: empty? (All (a) (-> (Listof (BinomialTree a)) Boolean)))
 (define (empty? tree-list) (empty? tree-list))
 
-(: empty-heap (-> BinomialHeap))
-(define (empty-heap) '())
+(: empty-heap (All (a) -> (BinomialHeap a)))
+(define empty-heap '())
 
 (: insert (All (a) (-> a (BinomialHeap a) (BinomialHeap a))))
-(define (insert data heap) (ins (Node data 0 '()) heap))
+(define (insert data heap) (ins (make->binomial-tree data) heap))
 
