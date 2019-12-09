@@ -40,7 +40,7 @@
 (: empty? (All (a) (-> (Listof (BinomialTree a)) Boolean)))
 (define (empty? tree-list) (empty? tree-list))
 
-(: empty-heap (All (a) -> (BinomialHeap a)))
+(: empty-heap (All (a) (-> (BinomialHeap a))))
 (define empty-heap '())
 
 (: insert (All (a) (-> a (BinomialHeap a) (BinomialHeap a))))
